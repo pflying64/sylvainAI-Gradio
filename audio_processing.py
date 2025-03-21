@@ -1,8 +1,4 @@
-from openai import OpenAI
-import os
-
-# Client OpenAI per Whisper
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+from shared_client import client
 
 def transcribe_audio(audio_path):
     """Trascrivi audio usando OpenAI Whisper API"""

@@ -1,36 +1,22 @@
 import os
 import time
-from openai import OpenAI
-from dotenv import load_dotenv
+from shared_client import client
 
-# Assicuriamoci che le variabili d'ambiente vengano caricate
-load_dotenv()
-
-# Configura client OpenAI
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 ASSISTANT_ID = os.getenv("ASSISTANT_ID")
 
-# Debug
-print(f"OpenAI API Key present: {bool(os.getenv('OPENAI_API_KEY'))}")
-print(f"Assistant ID: {ASSISTANT_ID}")
-
 def get_assistant_response(thread, user_message):
-    """Ottieni risposta dall'assistente OpenAI"""
     try:
-        # Aggiungi messaggio dell'utente
         client.beta.threads.messages.create(
             thread_id=thread,
             role="user",
             content=user_message
         )
 
-        # Esegui l'assistente
         run = client.beta.threads.runs.create(
             thread_id=thread,
             assistant_id=ASSISTANT_ID
         )
 
-        # Attendi il completamento
         while True:
             run = client.beta.threads.runs.retrieve(
                 thread_id=thread,
@@ -42,11 +28,13 @@ def get_assistant_response(thread, user_message):
                 raise Exception("Run failed")
             time.sleep(0.5)
 
-        # Ottieni la risposta
         messages = client.beta.threads.messages.list(
             thread_id=thread
         )
         return messages.data[0].content[0].text.value
 
     except Exception as e:
+        print(f"Full OpenAI error: {str(e)}")
+        if hasattr(e, 'response'):
+            print(f"Response details: {e.response.text}")
         return f"Error: {str(e)}"
