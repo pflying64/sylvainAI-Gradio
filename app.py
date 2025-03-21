@@ -8,7 +8,7 @@ from elevenlabs_integration import text_to_speech
 from audio_processing import transcribe_audio
 
 os.system('pip show openai')
-
+#test
 
 load_dotenv()
 
