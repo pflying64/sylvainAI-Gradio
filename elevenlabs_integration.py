@@ -15,7 +15,6 @@ print(f"ElevenLabs API Key present: {bool(ELEVENLABS_API_KEY)}")
 print(f"Custom Voice ID: {CUSTOM_VOICE_ID}")
 
 # Inizializza il client ElevenLabs con autenticazione esplicita negli headers
-# Modifica questa parte:
 elevenlabs_client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
 
 def text_to_speech(text, model="eleven_flash_v2_5"):
@@ -28,11 +27,11 @@ def text_to_speech(text, model="eleven_flash_v2_5"):
         
         # Configura i parametri della voce personalizzati
         voice_settings = {
-            "stability": 0.50,        # Stabilità media per un buon equilibrio tra coerenza e variabilità
-            "similarity_boost": 0.75,  # Somiglianza alta alla voce originale
-            "style": 0.0,             # Nessuna esagerazione dello stile
-            "use_speaker_boost": True, # Migliora la somiglianza all'oratore originale
-            "speed": 0.93             # Velocità leggermente inferiore al normale
+            "stability": 0.50,
+            "similarity_boost": 0.75,
+            "style": 0.0,
+            "use_speaker_boost": True,
+            "speed": 0.93
         }
         
         # Genera l'audio con la voce custom
