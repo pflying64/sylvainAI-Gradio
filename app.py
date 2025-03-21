@@ -7,6 +7,9 @@ from openai_integration import client as openai_client, get_assistant_response
 from elevenlabs_integration import text_to_speech
 from audio_processing import transcribe_audio
 
+os.system('pip show openai')
+
+
 load_dotenv()
 
 def process_audio_input(audio_path, thread_id):
