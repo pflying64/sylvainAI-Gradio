@@ -2,6 +2,8 @@ import gradio as gr
 import os
 from dotenv import load_dotenv
 
+print(f"Gradio version: {gr.__version__}")  # Aggiunto print versione
+
 from ui_components import css, bg_style
 from openai_integration import client as openai_client, get_assistant_response
 from elevenlabs_integration import text_to_speech
