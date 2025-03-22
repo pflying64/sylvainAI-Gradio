@@ -81,10 +81,28 @@ body::before {
     padding: 1rem;
 }
 
-/* Nascondere branding Gradio */
 footer {
     display: none !important;
 }
+"""
+
+# Custom JavaScript per cambiare il testo del pulsante
+custom_js = """
+<script>
+function updateRecordButton() {
+    const recordBtn = document.querySelector('.record');
+    if (recordBtn) {
+        recordBtn.textContent = 'SPEAK';
+    }
+}
+
+// Esegui al caricamento
+document.addEventListener('DOMContentLoaded', updateRecordButton);
+
+// Osserva cambiamenti nel DOM
+const observer = new MutationObserver(updateRecordButton);
+observer.observe(document.body, { childList: true, subtree: true });
+</script>
 """
 
 bg_style = """
@@ -95,4 +113,4 @@ body {
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
-"""
+""" + custom_js

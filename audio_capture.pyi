@@ -4,15 +4,9 @@ import base64
 from gradio.events import Dependency
 
 class AutoStopAudio(gr.Audio):
-    """Audio component with automatic silence detection"""
-    
     def __init__(self, **kwargs):
-        print("Initializing AutoStopAudio")
-        super().__init__(
-            type="filepath",
-            **kwargs
-        )
-        print("AutoStopAudio initialized")
+        kwargs["sources"] = ["microphone"]  # sources, non source
+        super().__init__(**kwargs)
     
     def get_template_context(self):
         ctx = super().get_template_context()
@@ -27,6 +21,7 @@ function silenceDetector(opts) {
     const SILENCE_THRESHOLD = -50;
     const SILENCE_DURATION = 2000;
     const MIN_RECORDING_TIME = 3000;
+    const MAX_RECORDING_TIME = 30000;
     
     async function startRecording(el) {
         try {
@@ -47,11 +42,12 @@ function silenceDetector(opts) {
             mediaRecorder.addEventListener("stop", () => {
                 const audioBlob = new Blob(audioChunks);
                 el.value = audioBlob;
+                el.querySelector(".record-button").classList.remove("recording");
                 opts.trigger("change");
             });
             
-            mediaRecorder.start();
-            el.querySelector(".status").textContent = "Recording...";
+            mediaRecorder.start(100);
+            el.querySelector(".record-button").classList.add("recording");
             
             const buffer = new Float32Array(analyzer.frequencyBinCount);
             
@@ -62,10 +58,19 @@ function silenceDetector(opts) {
                 const rms = Math.sqrt(buffer.reduce((acc, val) => acc + val * val, 0) / buffer.length);
                 const db = 20 * Math.log10(rms);
                 
+                const currentTime = Date.now();
+                const recordingDuration = currentTime - startTime;
+                
+                if (recordingDuration >= MAX_RECORDING_TIME) {
+                    stopRecording(el);
+                    return;
+                }
+                
                 if (db < SILENCE_THRESHOLD) {
-                    if (!silenceStart) silenceStart = Date.now();
-                    else if (Date.now() - silenceStart > SILENCE_DURATION && 
-                            Date.now() - startTime > MIN_RECORDING_TIME) {
+                    if (!silenceStart) {
+                        silenceStart = currentTime;
+                    } else if (currentTime - silenceStart > SILENCE_DURATION && 
+                             recordingDuration > MIN_RECORDING_TIME) {
                         stopRecording(el);
                         return;
                     }
@@ -78,9 +83,13 @@ function silenceDetector(opts) {
             
             checkSilence();
             
+            if (opts.start_recording_trigger) {
+                opts.start_recording_trigger();
+            }
+            
         } catch (err) {
             console.error("Recording error:", err);
-            el.querySelector(".status").textContent = "Error starting recording";
+            el.querySelector(".record-button").classList.remove("recording");
         }
     }
     
@@ -88,7 +97,7 @@ function silenceDetector(opts) {
         if (mediaRecorder && mediaRecorder.state === "recording") {
             mediaRecorder.stop();
             mediaRecorder.stream.getTracks().forEach(track => track.stop());
-            el.querySelector(".status").textContent = "Click to record";
+            el.querySelector(".record-button").classList.remove("recording");
         }
     }
     

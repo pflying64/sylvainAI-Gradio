@@ -8,6 +8,20 @@ from elevenlabs_integration import text_to_speech
 from audio_processing import transcribe_audio
 
 load_dotenv()
+from gradio.events import Dependency
+
+class CustomAudio(gr.Audio):
+    def preprocess(self, x):
+        return super().preprocess(x)
+    
+    def get_template_context(self):
+        context = super().get_template_context()
+        context["record_button_text"] = "SPEAK"
+        return context
+    from typing import Callable, Literal, Sequence, Any, TYPE_CHECKING
+    from gradio.blocks import Block
+    if TYPE_CHECKING:
+        from gradio.components import Timer
 
 def process_audio_input(audio_path, thread_id):
     if audio_path is None:
@@ -39,7 +53,7 @@ with gr.Blocks(css=css + bg_style) as demo:
         gr.HTML('<p class="introduction">Hello, I\'m Karen, Sylvain\'s daughter. Ask me anything about his pioneering work in art collection and digital technologies...</p>')
 
         waveform_options = gr.WaveformOptions(show_recording_waveform=False)
-        audio_input = gr.Audio(sources=["microphone"], type="filepath", label="User", elem_classes="audio-input", waveform_options=waveform_options)
+        audio_input = CustomAudio(sources=["microphone"], type="filepath", label="User", elem_classes="audio-input", waveform_options=waveform_options)
         audio_output = gr.Audio(label="Karen", elem_classes="audio-output", autoplay=True)
 
     audio_input.change(
