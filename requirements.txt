@@ -3,3 +3,4 @@ openai==1.66.5
 httpx==0.27.2
 python-dotenv==1.0.0
 elevenlabs==1.13.5
+# Aggiunto Dom 23 Mar 2025 11:10:27 +07
