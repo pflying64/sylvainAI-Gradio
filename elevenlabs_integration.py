@@ -1,6 +1,7 @@
 # elevenlabs_integration.py
 import os
 import tempfile
+import time
 from elevenlabs.client import ElevenLabs
 from dotenv import load_dotenv
 
@@ -11,7 +12,7 @@ CUSTOM_VOICE_ID = os.getenv("ELEVENLABS_CUSTOM_VOICE_ID")
 
 elevenlabs_client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
 
-def text_to_speech(text, model="eleven_flash_v2_5"):  # Versione più veloce
+def text_to_speech(text, model="eleven_flash_v2_5"):
     try:
         voice_settings = {
             "stability": 0.50,
@@ -29,26 +30,26 @@ def text_to_speech(text, model="eleven_flash_v2_5"):  # Versione più veloce
             output_format="mp3_44100_64"  # Bitrate più basso
         )
         
-        # Assicurati che il file sia completamente scritto
-        temp_file = tempfile.NamedTemporaryFile(suffix=".mp3", delete=False)
+        # Crea la cartella audio dentro files
+        output_dir = "files/audio"
+        os.makedirs(output_dir, exist_ok=True)
+        
+        # Nome file con timestamp
+        filename = f"{output_dir}/response_{int(time.time())}.mp3"
+        
         total_bytes = 0
+        with open(filename, "wb") as f:
+            for chunk in audio_stream:
+                if isinstance(chunk, bytes):
+                    total_bytes += len(chunk)
+                    f.write(chunk)
         
-        for chunk in audio_stream:
-            if isinstance(chunk, bytes):
-                total_bytes += len(chunk)
-                temp_file.write(chunk)
-        
-        temp_file.flush()
-        os.fsync(temp_file.fileno())
-        temp_file.close()
-        
-        print(f"Audio generato: {total_bytes} bytes")
+        print(f"Audio generato: {total_bytes} bytes in {filename}")
         
         # Breve pausa per garantire che il file sia completo
-        import time
         time.sleep(0.2)
         
-        return temp_file.name
+        return filename
             
     except Exception as e:
         print(f"Errore nella sintesi vocale: {str(e)}")
