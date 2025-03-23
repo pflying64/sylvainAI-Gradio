@@ -36,12 +36,10 @@ ENV/
 Thumbs.db
 
 # Temp files
-*.mp3
+# *.mp3
 tmp/
 temp/
 
 # Logs
 *.log
-descrizione progetto1.txt
-descrizione progetto1.txt
-descrizione progetto1.txt
+
