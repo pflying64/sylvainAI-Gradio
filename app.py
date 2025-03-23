@@ -42,7 +42,7 @@ with gr.Blocks(css=css + bg_style) as demo:
 
         waveform_options = gr.WaveformOptions(show_recording_waveform=False)
         audio_input = gr.Audio(sources=["microphone"], type="filepath", label="User", elem_classes="audio-input", waveform_options=waveform_options)
-        audio_output = gr.Audio(label="Karen", elem_classes="audio-output", autoplay=True)
+        audio_output = gr.Audio(label="Karen", elem_classes="audio-output", autoplay=True, streaming=False) # Modificato qui
 
     audio_input.change(
         process_audio_input,

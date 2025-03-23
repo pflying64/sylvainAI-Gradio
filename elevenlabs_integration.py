@@ -1,3 +1,4 @@
+# elevenlabs_integration.py
 import os
 import tempfile
 from elevenlabs.client import ElevenLabs
@@ -10,7 +11,7 @@ CUSTOM_VOICE_ID = os.getenv("ELEVENLABS_CUSTOM_VOICE_ID")
 
 elevenlabs_client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
 
-def text_to_speech(text, model="eleven_flash_v2_5"):
+def text_to_speech(text, model="eleven_flash_v2_5"):  # Versione più veloce
     try:
         voice_settings = {
             "stability": 0.50,
@@ -24,18 +25,29 @@ def text_to_speech(text, model="eleven_flash_v2_5"):
             text=text,
             voice_id=CUSTOM_VOICE_ID,
             model_id=model,
-            voice_settings=voice_settings
+            voice_settings=voice_settings,
+            output_format="mp3_44100_64"  # Bitrate più basso
         )
         
-        # Create unique temp file
+        # Assicurati che il file sia completamente scritto
         temp_file = tempfile.NamedTemporaryFile(suffix=".mp3", delete=False)
+        total_bytes = 0
         
-        # Write chunks to file
         for chunk in audio_stream:
             if isinstance(chunk, bytes):
+                total_bytes += len(chunk)
                 temp_file.write(chunk)
         
+        temp_file.flush()
+        os.fsync(temp_file.fileno())
         temp_file.close()
+        
+        print(f"Audio generato: {total_bytes} bytes")
+        
+        # Breve pausa per garantire che il file sia completo
+        import time
+        time.sleep(0.2)
+        
         return temp_file.name
             
     except Exception as e:
